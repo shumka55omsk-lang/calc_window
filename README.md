@@ -1,63 +1,37 @@
-# Калькулятор мягких окон для Vercel — исправленная версия
+# Калькулятор мягких окон для Vercel
 
-## Что исправлено
+Исправленная версия с уменьшенным размером PDF для отправки в Telegram.
 
-Ошибка Vercel:
+## Что есть
 
-```text
-Error: Function Runtimes must have a valid version, for example `now-php@1.0.0`
-```
+- Высота 1 и Высота 2 для наклонных проёмов.
+- Площадь считается по большей высоте.
+- Чертёж строится как трапеция.
+- Молния рисуется с двух сторон при включённой галочке.
+- PDF сжимается перед отправкой, чтобы не превышать лимит Vercel.
 
-возникала из-за настройки runtime в `vercel.json`.
+## Переменные окружения Vercel
 
-В этой версии:
-- `vercel.json` удалён;
-- API работает на стандартном Node.js runtime Vercel;
-- в `package.json` добавлено `"type": "module"`;
-- Telegram-токен хранится только в Environment Variables.
-
-## Структура
-
-```text
-public/index.html
-api/send-telegram.js
-package.json
-.env.example
-README.md
-```
-
-## Как выложить
-
-1. Залейте содержимое этой папки в GitHub.
-2. В Vercel импортируйте репозиторий.
-3. В Vercel → Project → Settings → Environment Variables добавьте:
+Добавьте в Project → Settings → Environment Variables:
 
 ```env
-TELEGRAM_BOT_TOKEN=ваш_токен_бота
+TELEGRAM_BOT_TOKEN=ваш_токен
 TELEGRAM_CHAT_ID=ваш_chat_id
 ```
 
-4. Сделайте Redeploy.
+После добавления переменных сделайте Redeploy.
 
-## Проверка API
+## Проверка
 
 Откройте:
 
 ```text
-https://ваш-домен.vercel.app/api/send-telegram
+https://ваш-сайт.vercel.app/api/send-telegram
 ```
 
-Должно показать:
+Должно быть:
 
 ```json
-{
-  "ok": true,
-  "api": "send-telegram",
-  "mode": "sendDocument",
-  "runtime": "nodejs-default",
-  "telegramBotTokenConfigured": true,
-  "telegramChatIdConfigured": true
-}
+"telegramBotTokenConfigured": true,
+"telegramChatIdConfigured": true
 ```
-
-Если `telegramBotTokenConfigured` или `telegramChatIdConfigured` равны `false`, значит переменные окружения не добавлены или не применился новый деплой.

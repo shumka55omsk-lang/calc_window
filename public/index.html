@@ -6,247 +6,43 @@
   <title>Калькулятор мягких окон</title>
   <style>
     * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-      background: #eef3f8;
-      color: #1f2933;
-    }
-
-    .container {
-      max-width: 1380px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.08);
-      padding: 24px 28px;
-    }
-
-    h1 {
-      margin: 0 0 18px;
-      text-align: center;
-      font-size: 30px;
-      line-height: 1.2;
-    }
-
-    h2 {
-      margin: 24px 0 14px;
-      font-size: 22px;
-    }
-
-    .grid {
-      display: grid;
-      gap: 14px;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    }
-
-    .field label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .field input {
-      width: 100%;
-      padding: 11px 12px;
-      border: 1px solid #d3dae4;
-      border-radius: 10px;
-      font-size: 15px;
-      background: #fff;
-    }
-
-    .table-responsive {
-      width: 100%;
-      overflow-x: auto;
-      padding-bottom: 4px;
-    }
-
-    table {
-      width: 100%;
-      min-width: 1280px;
-      border-collapse: collapse;
-      margin-top: 8px;
-    }
-
-    th, td {
-      padding: 9px 7px;
-      border-bottom: 1px solid #e5ebf2;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 13px;
-    }
-
-    th {
-      background: #f3f7fb;
-      font-weight: 800;
-    }
-
-    td input[type="number"] {
-      width: 100%;
-      min-width: 58px;
-      padding: 7px 7px;
-      border: 1px solid #d3dae4;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    td input[type="checkbox"] {
-      transform: scale(1.18);
-      cursor: pointer;
-    }
-
-    td input:disabled {
-      background: #eef1f5;
-      color: #8993a1;
-    }
-
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 10px;
-      padding: 11px 16px;
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: .15s ease;
-    }
-
+    body { margin: 0; padding: 20px; font-family: "Segoe UI", Tahoma, Arial, sans-serif; background: #eef3f8; color: #1f2933; }
+    .container { max-width: 1380px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 12px 35px rgba(0,0,0,0.08); padding: 24px 28px; }
+    h1 { margin: 0 0 18px; text-align: center; font-size: 30px; line-height: 1.2; }
+    h2 { margin: 24px 0 14px; font-size: 22px; }
+    .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+    .field label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; }
+    .field input { width: 100%; padding: 11px 12px; border: 1px solid #d3dae4; border-radius: 10px; font-size: 15px; background: #fff; }
+    .table-responsive { width: 100%; overflow-x: auto; padding-bottom: 4px; }
+    table { width: 100%; min-width: 1280px; border-collapse: collapse; margin-top: 8px; }
+    th, td { padding: 9px 7px; border-bottom: 1px solid #e5ebf2; text-align: center; vertical-align: middle; font-size: 13px; }
+    th { background: #f3f7fb; font-weight: 800; }
+    td input[type="number"] { width: 100%; min-width: 58px; padding: 7px 7px; border: 1px solid #d3dae4; border-radius: 8px; font-size: 14px; }
+    td input[type="checkbox"] { transform: scale(1.18); cursor: pointer; }
+    td input:disabled { background: #eef1f5; color: #8993a1; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .btn { border: none; border-radius: 10px; padding: 11px 16px; font-size: 14px; font-weight: 800; cursor: pointer; transition: .15s ease; }
     .btn:hover { transform: translateY(-1px); }
-
-    .btn-primary {
-      background: #1f6feb;
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background: #eef2f6;
-      color: #1f2933;
-    }
-
-    .btn-danger {
-      background: #e74c3c;
-      color: #fff;
-      padding: 8px 11px;
-    }
-
-    .summary-grid {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    }
-
-    .summary-card {
-      background: #fafcff;
-      border: 1px solid #e4ebf3;
-      border-radius: 14px;
-      padding: 16px;
-    }
-
-    .summary-card .title {
-      font-size: 13px;
-      color: #667085;
-      margin-bottom: 6px;
-    }
-
-    .summary-card .value {
-      font-size: 25px;
-      font-weight: 900;
-      color: #111827;
-    }
-
-    .pdf-preview-wrapper {
-      margin-top: 16px;
-      border: 1px solid #e4ebf3;
-      border-radius: 14px;
-      background: #fbfdff;
-      padding: 18px;
-      overflow-x: auto;
-    }
-
-    #pdfLayout {
-      background: #fff;
-      padding: 12px;
-      border-radius: 10px;
-    }
-
-    .pdf-header {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    .pdf-header h3 {
-      margin: 0;
-      font-size: 22px;
-    }
-
-    .pdf-info {
-      font-size: 14px;
-      line-height: 1.45;
-      margin-bottom: 14px;
-    }
-
-    .pdf-drawings-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 14px;
-    }
-
-    .pdf-drawing-item {
-      border: 1px solid #e4ebf3;
-      border-radius: 12px;
-      padding: 10px;
-      background: #fff;
-      break-inside: avoid;
-    }
-
-    .pdf-drawing-item h4 {
-      margin: 0 0 8px;
-      font-size: 16px;
-    }
-
-    .pdf-drawing-item .meta {
-      font-size: 13px;
-      color: #4b5563;
-      line-height: 1.4;
-      margin-bottom: 8px;
-    }
-
-    .pdf-summary {
-      margin-top: 16px;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    .hint {
-      margin-top: 12px;
-      color: #667085;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    @media (max-width: 760px) {
-      body { padding: 10px; }
-      .container { padding: 14px; border-radius: 14px; }
-      h1 { font-size: 24px; }
-      h2 { font-size: 19px; }
-      .summary-card .value { font-size: 21px; }
-      .pdf-preview-wrapper { padding: 10px; }
-    }
-
-    @media print {
-      body { background: #fff; padding: 0; }
-      .container { box-shadow: none; border-radius: 0; }
-      .buttons, .hint { display: none !important; }
-    }
+    .btn-primary { background: #1f6feb; color: #fff; }
+    .btn-secondary { background: #eef2f6; color: #1f2933; }
+    .btn-danger { background: #e74c3c; color: #fff; padding: 8px 11px; }
+    .summary-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+    .summary-card { background: #fafcff; border: 1px solid #e4ebf3; border-radius: 14px; padding: 16px; }
+    .summary-card .title { font-size: 13px; color: #667085; margin-bottom: 6px; }
+    .summary-card .value { font-size: 25px; font-weight: 900; color: #111827; }
+    .pdf-preview-wrapper { margin-top: 16px; border: 1px solid #e4ebf3; border-radius: 14px; background: #fbfdff; padding: 18px; overflow-x: auto; }
+    #pdfLayout { background: #fff; padding: 12px; border-radius: 10px; }
+    .pdf-header { text-align: center; margin-bottom: 10px; }
+    .pdf-header h3 { margin: 0; font-size: 22px; }
+    .pdf-info { font-size: 14px; line-height: 1.45; margin-bottom: 14px; }
+    .pdf-drawings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+    .pdf-drawing-item { border: 1px solid #e4ebf3; border-radius: 12px; padding: 10px; background: #fff; break-inside: avoid; }
+    .pdf-drawing-item h4 { margin: 0 0 8px; font-size: 16px; }
+    .pdf-drawing-item .meta { font-size: 13px; color: #4b5563; line-height: 1.4; margin-bottom: 8px; }
+    .pdf-summary { margin-top: 16px; font-size: 14px; line-height: 1.45; }
+    .hint { margin-top: 12px; color: #667085; font-size: 13px; line-height: 1.45; }
+    @media (max-width: 760px) { body { padding: 10px; } .container { padding: 14px; border-radius: 14px; } h1 { font-size: 24px; } h2 { font-size: 19px; } .summary-card .value { font-size: 21px; } .pdf-preview-wrapper { padding: 10px; } }
+    @media print { body { background: #fff; padding: 0; } .container { box-shadow: none; border-radius: 0; } .buttons, .hint { display: none !important; } }
   </style>
 </head>
 <body>
@@ -255,50 +51,20 @@
 
     <h2>Данные заказа</h2>
     <div class="grid">
-      <div class="field">
-        <label for="orderNumber">Номер заказа</label>
-        <input type="text" id="orderNumber" placeholder="Напр. 00123">
-      </div>
-      <div class="field">
-        <label for="clientName">Имя клиента</label>
-        <input type="text" id="clientName" placeholder="ФИО">
-      </div>
-      <div class="field">
-        <label for="clientAddress">Адрес клиента</label>
-        <input type="text" id="clientAddress" placeholder="Город, улица, дом">
-      </div>
-      <div class="field">
-        <label for="orderDate">Дата</label>
-        <input type="date" id="orderDate">
-      </div>
+      <div class="field"><label for="orderNumber">Номер заказа</label><input type="text" id="orderNumber" placeholder="Напр. 00123"></div>
+      <div class="field"><label for="clientName">Имя клиента</label><input type="text" id="clientName" placeholder="ФИО"></div>
+      <div class="field"><label for="clientAddress">Адрес клиента</label><input type="text" id="clientAddress" placeholder="Город, улица, дом"></div>
+      <div class="field"><label for="orderDate">Дата</label><input type="date" id="orderDate"></div>
     </div>
 
     <h2>Настройки цен</h2>
     <div class="grid">
-      <div class="field">
-        <label for="pricePerM2">Цена за 1 м², ₽</label>
-        <input type="number" id="pricePerM2" value="1500" min="0" step="1">
-      </div>
-      <div class="field">
-        <label for="edgingPrice">Окантовка, ₽ / пог. м</label>
-        <input type="number" id="edgingPrice" value="120" min="0" step="1">
-      </div>
-      <div class="field">
-        <label for="strapPrice">Ремень, ₽ / шт</label>
-        <input type="number" id="strapPrice" value="80" min="0" step="1">
-      </div>
-      <div class="field">
-        <label for="zipperPrice">Молния, ₽ / пог. м</label>
-        <input type="number" id="zipperPrice" value="250" min="0" step="1">
-      </div>
-      <div class="field">
-        <label for="installPrice">Монтаж, ₽ / окно</label>
-        <input type="number" id="installPrice" value="500" min="0" step="1">
-      </div>
-      <div class="field">
-        <label for="edgingWidth">Ширина окантовки, см</label>
-        <input type="number" id="edgingWidth" value="5" min="0" step="0.1">
-      </div>
+      <div class="field"><label for="pricePerM2">Цена за 1 м², ₽</label><input type="number" id="pricePerM2" value="1500" min="0" step="1"></div>
+      <div class="field"><label for="edgingPrice">Окантовка, ₽ / пог. м</label><input type="number" id="edgingPrice" value="120" min="0" step="1"></div>
+      <div class="field"><label for="strapPrice">Ремень, ₽ / шт</label><input type="number" id="strapPrice" value="80" min="0" step="1"></div>
+      <div class="field"><label for="zipperPrice">Молния, ₽ / пог. м</label><input type="number" id="zipperPrice" value="250" min="0" step="1"></div>
+      <div class="field"><label for="installPrice">Монтаж, ₽ / окно</label><input type="number" id="installPrice" value="500" min="0" step="1"></div>
+      <div class="field"><label for="edgingWidth">Ширина окантовки, см</label><input type="number" id="edgingWidth" value="5" min="0" step="0.1"></div>
     </div>
 
     <h2>Параметры окон</h2>
@@ -332,38 +98,19 @@
       <button class="btn btn-secondary" onclick="resetRows()">Очистить окна</button>
     </div>
 
-    <div class="hint">
-      Для проёмов с наклоном укажите две высоты: высота 1 — слева, высота 2 — справа. Площадь считается по большей высоте: ширина × max(высота 1, высота 2).
-    </div>
+    <div class="hint">Для проёмов с наклоном укажите две высоты: высота 1 — слева, высота 2 — справа. Площадь считается по большей высоте: ширина × max(высота 1, высота 2).</div>
 
     <h2>Итоги</h2>
     <div class="summary-grid">
-      <div class="summary-card">
-        <div class="title">Всего окон</div>
-        <div class="value" id="totalQty">0</div>
-      </div>
-      <div class="summary-card">
-        <div class="title">Общая площадь</div>
-        <div class="value" id="totalArea">0.00 м²</div>
-      </div>
-      <div class="summary-card">
-        <div class="title">Сумма по полотну</div>
-        <div class="value" id="baseTotal">0 ₽</div>
-      </div>
-      <div class="summary-card">
-        <div class="title">Сумма допов</div>
-        <div class="value" id="extraTotal">0 ₽</div>
-      </div>
-      <div class="summary-card">
-        <div class="title">Итого</div>
-        <div class="value" id="grandTotal">0 ₽</div>
-      </div>
+      <div class="summary-card"><div class="title">Всего окон</div><div class="value" id="totalQty">0</div></div>
+      <div class="summary-card"><div class="title">Общая площадь</div><div class="value" id="totalArea">0.00 м²</div></div>
+      <div class="summary-card"><div class="title">Сумма по полотну</div><div class="value" id="baseTotal">0 ₽</div></div>
+      <div class="summary-card"><div class="title">Сумма допов</div><div class="value" id="extraTotal">0 ₽</div></div>
+      <div class="summary-card"><div class="title">Итого</div><div class="value" id="grandTotal">0 ₽</div></div>
     </div>
 
     <h2>Превью PDF</h2>
-    <div class="pdf-preview-wrapper">
-      <div id="pdfLayout"></div>
-    </div>
+    <div class="pdf-preview-wrapper"><div id="pdfLayout"></div></div>
 
     <div class="buttons">
       <button class="btn btn-primary" id="downloadPdfBtn">Скачать PDF</button>
@@ -371,9 +118,7 @@
       <span id="pdfStatus" style="display:none; font-size:14px; color:#667085;">Создание PDF…</span>
     </div>
 
-    <div class="hint">
-      В Vercel отправка в Telegram работает через серверную функцию <b>/api/send-telegram</b>. Токен бота хранится в Environment Variables, а не в HTML-коде.
-    </div>
+    <div class="hint">PDF сжимается перед отправкой, чтобы не превышать лимит Vercel. Отправка работает через серверную функцию <b>/api/send-telegram</b>.</div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -382,17 +127,9 @@
   <script>
     const tableBody = document.getElementById('tableBody');
 
-    function money(value) {
-      return new Intl.NumberFormat('ru-RU').format(Math.round(value || 0)) + ' ₽';
-    }
-
-    function num(value) {
-      return parseFloat(value) || 0;
-    }
-
-    function intNum(value) {
-      return parseInt(value, 10) || 0;
-    }
+    function money(value) { return new Intl.NumberFormat('ru-RU').format(Math.round(value || 0)) + ' ₽'; }
+    function num(value) { return parseFloat(value) || 0; }
+    function intNum(value) { return parseInt(value, 10) || 0; }
 
     function addRow(width, height1, height2, qty, edging, straps, hasZipper, zipperCm, install, zipperOffset) {
       if (typeof width === 'undefined') width = '';
@@ -424,9 +161,7 @@
         <td class="rowTotal">0 ₽</td>
         <td><button class="btn btn-danger" onclick="removeRow(this)">×</button></td>
       `;
-
       tableBody.appendChild(tr);
-
       tr.querySelectorAll('input').forEach(function(input) {
         input.addEventListener('input', calculate);
         input.addEventListener('change', calculate);
@@ -435,31 +170,21 @@
       const hasZipperInput = tr.querySelector('.hasZipper');
       const zipperInput = tr.querySelector('.zipper');
       const zipperOffsetInput = tr.querySelector('.zipperOffset');
-
       function toggleZipperFields() {
         const checked = hasZipperInput.checked;
         zipperInput.disabled = !checked;
         zipperOffsetInput.disabled = !checked;
       }
-
       hasZipperInput.addEventListener('change', function() {
         toggleZipperFields();
         calculate();
       });
-
       toggleZipperFields();
       calculate();
     }
 
-    function removeRow(btn) {
-      btn.closest('tr').remove();
-      calculate();
-    }
-
-    function resetRows() {
-      tableBody.innerHTML = '';
-      calculate();
-    }
+    function removeRow(btn) { btn.closest('tr').remove(); calculate(); }
+    function resetRows() { tableBody.innerHTML = ''; calculate(); }
 
     function getRowData(row, index) {
       const widthCm = num(row.querySelector('.width').value);
@@ -473,21 +198,7 @@
       const zipperCmPerSide = hasZipper ? num(row.querySelector('.zipper').value) : 0;
       const zipperOffsetCm = hasZipper ? num(row.querySelector('.zipperOffset').value) : 0;
       const installChecked = row.querySelector('.install').checked;
-
-      return {
-        index: index + 1,
-        widthCm,
-        height1Cm,
-        height2Cm,
-        maxHeightCm,
-        qty,
-        edgingChecked,
-        strapsPerWindow,
-        hasZipper,
-        zipperCmPerSide,
-        zipperOffsetCm,
-        installChecked
-      };
+      return { index: index + 1, widthCm, height1Cm, height2Cm, maxHeightCm, qty, edgingChecked, strapsPerWindow, hasZipper, zipperCmPerSide, zipperOffsetCm, installChecked };
     }
 
     function calculate() {
@@ -498,37 +209,22 @@
       const zipperPrice = num(document.getElementById('zipperPrice').value);
       const installPrice = num(document.getElementById('installPrice').value);
 
-      let totalQty = 0;
-      let totalArea = 0;
-      let baseTotal = 0;
-      let extraTotal = 0;
-      let grandTotal = 0;
+      let totalQty = 0, totalArea = 0, baseTotal = 0, extraTotal = 0, grandTotal = 0;
       const drawingsData = [];
 
-      const rows = tableBody.querySelectorAll('tr');
-
-      rows.forEach(function(row, index) {
+      tableBody.querySelectorAll('tr').forEach(function(row, index) {
         const item = getRowData(row, index);
         const widthM = item.widthCm / 100;
         const maxHeightM = item.maxHeightCm / 100;
-
-        // Площадь считается по большей высоте: ширина × max(высота 1, высота 2)
         const areaOne = widthM * maxHeightM;
         const areaTotal = areaOne * item.qty;
         const baseSum = areaTotal * pricePerM2;
 
-        // Окантовка: считаем по реальному периметру трапеции.
-        // Если высоты одинаковые, формула даст обычный прямоугольный периметр.
         const topSlopeM = Math.sqrt(Math.pow(widthM, 2) + Math.pow((item.height1Cm - item.height2Cm) / 100, 2));
         const perimeterOne = widthM + (item.height1Cm / 100) + (item.height2Cm / 100) + topSlopeM;
         const edgingSum = item.edgingChecked ? perimeterOne * item.qty * edgingPrice : 0;
-
         const strapsSum = item.strapsPerWindow * item.qty * strapPrice;
-
-        // Молния с двух сторон: длина на сторону × 2 стороны × кол-во × цена за пог. м
-        const zipperMetersPerSide = item.zipperCmPerSide / 100;
-        const zipperSum = item.hasZipper ? zipperMetersPerSide * 2 * item.qty * zipperPrice : 0;
-
+        const zipperSum = item.hasZipper ? (item.zipperCmPerSide / 100) * 2 * item.qty * zipperPrice : 0;
         const installSum = item.installChecked ? item.qty * installPrice : 0;
         const extrasSum = edgingSum + strapsSum + zipperSum + installSum;
         const rowTotal = baseSum + extrasSum;
@@ -545,20 +241,7 @@
         grandTotal += rowTotal;
 
         if (item.widthCm > 0 && item.height1Cm > 0 && item.height2Cm > 0) {
-          drawingsData.push({
-            index: item.index,
-            widthCm: item.widthCm,
-            height1Cm: item.height1Cm,
-            height2Cm: item.height2Cm,
-            maxHeightCm: item.maxHeightCm,
-            qty: item.qty,
-            straps: item.strapsPerWindow,
-            hasZipper: item.hasZipper,
-            zipperCmPerSide: item.zipperCmPerSide,
-            zipperOffsetCm: item.zipperOffsetCm,
-            edgingWidth,
-            installChecked: item.installChecked
-          });
+          drawingsData.push({ ...item, straps: item.strapsPerWindow, edgingWidth });
         }
       });
 
@@ -573,69 +256,34 @@
         clientName: document.getElementById('clientName').value,
         clientAddress: document.getElementById('clientAddress').value,
         orderDate: document.getElementById('orderDate').value,
-        totalQty,
-        totalArea,
-        baseTotal,
-        extraTotal,
-        grandTotal,
-        edgingWidth
+        totalQty, totalArea, baseTotal, extraTotal, grandTotal, edgingWidth
       });
     }
 
     function makeDrawingSVG(widthCm, height1Cm, height2Cm, index, straps, hasZipper, zipperCmPerSide, edgingWidthCm, zipperOffsetCm) {
-      const svgWidth = 340;
-      const svgHeight = 245;
-      const maxRectWidth = 210;
-      const maxRectHeight = 135;
+      const svgWidth = 340, svgHeight = 245, maxRectWidth = 210, maxRectHeight = 135;
       const maxHeightCm = Math.max(height1Cm, height2Cm);
-
       const outerWidthCm = widthCm + 2 * edgingWidthCm;
       const outerHeightCm = maxHeightCm + 2 * edgingWidthCm;
-
-      let scale = Math.min(
-        maxRectWidth / Math.max(outerWidthCm, 1),
-        maxRectHeight / Math.max(outerHeightCm, 1)
-      );
-
-      // Если проём очень высокий и узкий, не допускаем слишком маленькой ширины на схеме.
-      const minOuterWidthPx = 64;
-      if (outerWidthCm * scale < minOuterWidthPx) {
-        scale = minOuterWidthPx / outerWidthCm;
-      }
+      let scale = Math.min(maxRectWidth / Math.max(outerWidthCm, 1), maxRectHeight / Math.max(outerHeightCm, 1));
+      if (outerWidthCm * scale < 64) scale = 64 / outerWidthCm;
 
       const outerW = outerWidthCm * scale;
-      const outerH = outerHeightCm * scale;
       const outerX = (svgWidth - outerW) / 2;
       const outerTopY = 66;
-
       const innerX = outerX + edgingWidthCm * scale;
       const innerW = widthCm * scale;
       const bottomY = outerTopY + (edgingWidthCm + maxHeightCm) * scale;
-
       const innerTopLeftY = outerTopY + edgingWidthCm * scale + (maxHeightCm - height1Cm) * scale;
       const innerTopRightY = outerTopY + edgingWidthCm * scale + (maxHeightCm - height2Cm) * scale;
-
-      // Внешняя форма окантовки повторяет наклон внутреннего окна.
       const outerTopLeftY = innerTopLeftY - edgingWidthCm * scale;
       const outerTopRightY = innerTopRightY - edgingWidthCm * scale;
       const outerBottomY = bottomY + edgingWidthCm * scale;
       const outerRightX = innerX + innerW + edgingWidthCm * scale;
-
-      const outerPoints = [
-        outerX + ',' + outerTopLeftY,
-        outerRightX + ',' + outerTopRightY,
-        outerRightX + ',' + outerBottomY,
-        outerX + ',' + outerBottomY
-      ].join(' ');
-
-      const innerPoints = [
-        innerX + ',' + innerTopLeftY,
-        (innerX + innerW) + ',' + innerTopRightY,
-        (innerX + innerW) + ',' + bottomY,
-        innerX + ',' + bottomY
-      ].join(' ');
-
       const dimStroke = hasZipper ? 1.0 : 1.4;
+
+      const outerPoints = `${outerX},${outerTopLeftY} ${outerRightX},${outerTopRightY} ${outerRightX},${outerBottomY} ${outerX},${outerBottomY}`;
+      const innerPoints = `${innerX},${innerTopLeftY} ${innerX + innerW},${innerTopRightY} ${innerX + innerW},${bottomY} ${innerX},${bottomY}`;
 
       let strapElements = '';
       if (straps > 0) {
@@ -653,13 +301,10 @@
         const zipperStartY = bottomY - zipperLengthPx;
         const zipperEndY = bottomY;
         const offsetPx = zipperOffsetCm * scale;
-
         const leftZipperX = outerX + offsetPx;
         const rightZipperX = outerRightX - offsetPx;
-
         zipperElements += `<line x1="${leftZipperX}" y1="${zipperStartY}" x2="${leftZipperX}" y2="${zipperEndY}" stroke="#8e44ad" stroke-width="2" stroke-dasharray="5 4"/>`;
         zipperElements += `<line x1="${rightZipperX}" y1="${zipperStartY}" x2="${rightZipperX}" y2="${zipperEndY}" stroke="#8e44ad" stroke-width="2" stroke-dasharray="5 4"/>`;
-
         if (zipperOffsetCm > 0) {
           const offsetLineY = Math.min(outerTopLeftY, outerTopRightY) - 28;
           const leftMid = (outerX + leftZipperX) / 2;
@@ -680,28 +325,18 @@
       return `
         <svg width="100%" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <marker id="arrow-start-${index}" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto">
-              <path d="M6,0 L0,3 L6,6" fill="#34495e"/>
-            </marker>
-            <marker id="arrow-end-${index}" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
-              <path d="M0,0 L6,3 L0,6" fill="#34495e"/>
-            </marker>
+            <marker id="arrow-start-${index}" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="#34495e"/></marker>
+            <marker id="arrow-end-${index}" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#34495e"/></marker>
           </defs>
-
           <polygon points="${outerPoints}" fill="#f7d9c4" stroke="#8b5a2b" stroke-width="2"/>
           <polygon points="${innerPoints}" fill="#dfeeff" stroke="#1f6feb" stroke-width="2"/>
-
           <text x="${innerX + innerW / 2}" y="${bottomY - (maxHeightCm * scale) / 2}" text-anchor="middle" font-size="16" font-weight="800" fill="#1f2d3d">Окно ${index}</text>
-
           <line x1="${innerX}" y1="${widthLineY}" x2="${innerX + innerW}" y2="${widthLineY}" stroke="#34495e" stroke-width="${dimStroke}" marker-start="url(#arrow-start-${index})" marker-end="url(#arrow-end-${index})"/>
           <text x="${innerX + innerW / 2}" y="${widthLineY - 7}" text-anchor="middle" font-size="12" font-weight="800" fill="#34495e">${widthCm} см</text>
-
           <line x1="${leftHeightLineX}" y1="${innerTopLeftY}" x2="${leftHeightLineX}" y2="${bottomY}" stroke="#34495e" stroke-width="${dimStroke}" marker-start="url(#arrow-start-${index})" marker-end="url(#arrow-end-${index})"/>
           <text x="${leftHeightLineX - 8}" y="${leftHeightMidY}" text-anchor="middle" font-size="12" font-weight="800" fill="#34495e" transform="rotate(-90 ${leftHeightLineX - 8} ${leftHeightMidY})">${height1Cm} см</text>
-
           <line x1="${rightHeightLineX}" y1="${innerTopRightY}" x2="${rightHeightLineX}" y2="${bottomY}" stroke="#34495e" stroke-width="${dimStroke}" marker-start="url(#arrow-start-${index})" marker-end="url(#arrow-end-${index})"/>
           <text x="${rightHeightLineX + 10}" y="${rightHeightMidY}" text-anchor="middle" font-size="12" font-weight="800" fill="#34495e" transform="rotate(-90 ${rightHeightLineX + 10} ${rightHeightMidY})">${height2Cm} см</text>
-
           ${strapElements}
           ${zipperElements}
         </svg>
@@ -711,7 +346,6 @@
     function updatePdfLayout(drawingsData, summary) {
       const container = document.getElementById('pdfLayout');
       container.innerHTML = '';
-
       const header = document.createElement('div');
       header.className = 'pdf-header';
       header.innerHTML = `<h3>Расчёт мягких окон ${summary.orderNumber ? '№ ' + summary.orderNumber : ''}</h3>`;
@@ -719,36 +353,18 @@
 
       const info = document.createElement('div');
       info.className = 'pdf-info';
-      info.innerHTML = `
-        <div><strong>Клиент:</strong> ${summary.clientName || '-'}</div>
-        <div><strong>Адрес:</strong> ${summary.clientAddress || '-'}</div>
-        <div><strong>Дата:</strong> ${summary.orderDate || '-'}</div>
-        <div><strong>Принцип площади:</strong> ширина × большая высота</div>
-      `;
+      info.innerHTML = `<div><strong>Клиент:</strong> ${summary.clientName || '-'}</div><div><strong>Адрес:</strong> ${summary.clientAddress || '-'}</div><div><strong>Дата:</strong> ${summary.orderDate || '-'}</div><div><strong>Принцип площади:</strong> ширина × большая высота</div>`;
       container.appendChild(info);
 
       const drawingsWrap = document.createElement('div');
       drawingsWrap.className = 'pdf-drawings-grid';
-
       if (drawingsData.length) {
         drawingsData.forEach(function(item) {
           const itemDiv = document.createElement('div');
           itemDiv.className = 'pdf-drawing-item';
-
-          let zipperLine = '';
-          if (item.hasZipper && item.zipperCmPerSide > 0) {
-            zipperLine = `Молния: ${item.zipperCmPerSide} см × 2 стороны<br>`;
-          }
-
-          let offsetLine = '';
-          if (item.hasZipper && item.zipperOffsetCm > 0) {
-            offsetLine = `Отступ молнии: ${item.zipperOffsetCm} см от края окантовки<br>`;
-          }
-
-          const shapeLine = item.height1Cm === item.height2Cm
-            ? 'Форма: прямоугольник<br>'
-            : 'Форма: проём с наклоном<br>';
-
+          const zipperLine = (item.hasZipper && item.zipperCmPerSide > 0) ? `Молния: ${item.zipperCmPerSide} см × 2 стороны<br>` : '';
+          const offsetLine = (item.hasZipper && item.zipperOffsetCm > 0) ? `Отступ молнии: ${item.zipperOffsetCm} см от края окантовки<br>` : '';
+          const shapeLine = item.height1Cm === item.height2Cm ? 'Форма: прямоугольник<br>' : 'Форма: проём с наклоном<br>';
           itemDiv.innerHTML = `
             <h4>Окно ${item.index}</h4>
             <div class="meta">
@@ -761,45 +377,60 @@
               Окантовка: ${item.edgingWidth} см<br>
               ${offsetLine}
             </div>
-            <div>${makeDrawingSVG(item.widthCm, item.height1Cm, item.height2Cm, item.index, item.straps, item.hasZipper, item.zipperCmPerSide, item.edgingWidth, item.zipperOffsetCm)}</div>
-          `;
+            <div>${makeDrawingSVG(item.widthCm, item.height1Cm, item.height2Cm, item.index, item.straps, item.hasZipper, item.zipperCmPerSide, item.edgingWidth, item.zipperOffsetCm)}</div>`;
           drawingsWrap.appendChild(itemDiv);
         });
       } else {
-        drawingsWrap.innerHTML = `
-          <div class="pdf-drawing-item">
-            <div style="padding:20px;text-align:center;color:#667085;">Добавьте окно — здесь появится чертёж.</div>
-          </div>
-        `;
+        drawingsWrap.innerHTML = `<div class="pdf-drawing-item"><div style="padding:20px;text-align:center;color:#667085;">Добавьте окно — здесь появится чертёж.</div></div>`;
       }
-
       container.appendChild(drawingsWrap);
 
       const summaryDiv = document.createElement('div');
       summaryDiv.className = 'pdf-summary';
-      summaryDiv.innerHTML = `
-        <p><b>Всего окон:</b> ${summary.totalQty}</p>
-        <p><b>Общая площадь:</b> ${summary.totalArea.toFixed(2)} м²</p>
-        <p><b>Сумма по полотну:</b> ${money(summary.baseTotal)}</p>
-        <p><b>Сумма допов:</b> ${money(summary.extraTotal)}</p>
-        <p><b>Итого:</b> ${money(summary.grandTotal)}</p>
-        <p><b>Ширина окантовки:</b> ${summary.edgingWidth} см</p>
-      `;
+      summaryDiv.innerHTML = `<p><b>Всего окон:</b> ${summary.totalQty}</p><p><b>Общая площадь:</b> ${summary.totalArea.toFixed(2)} м²</p><p><b>Сумма по полотну:</b> ${money(summary.baseTotal)}</p><p><b>Сумма допов:</b> ${money(summary.extraTotal)}</p><p><b>Итого:</b> ${money(summary.grandTotal)}</p><p><b>Ширина окантовки:</b> ${summary.edgingWidth} см</p>`;
       container.appendChild(summaryDiv);
     }
 
     function createPdfBlob() {
       const pdfContainer = document.getElementById('pdfLayout');
       const isMobile = (window.innerWidth || document.documentElement.clientWidth) < 768;
-      return html2canvas(pdfContainer, { scale: isMobile ? 1 : 2 }).then(function(canvas) {
-        const imgData = canvas.toDataURL('image/png');
+      const renderScale = isMobile ? 0.75 : 0.9;
+      const jpegQuality = 0.52;
+
+      return html2canvas(pdfContainer, { scale: renderScale, backgroundColor: '#ffffff', useCORS: true }).then(function(canvas) {
+        const imgData = canvas.toDataURL('image/jpeg', jpegQuality);
         const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
         const imgProps = pdf.getImageProperties(imgData);
         const pageWidth = pdf.internal.pageSize.getWidth();
-        const marginLeft = 15;
-        const scaledWidth = pageWidth - marginLeft;
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const marginLeft = 15, marginRight = 8, marginTop = 8;
+        const scaledWidth = pageWidth - marginLeft - marginRight;
         const scaledHeight = (imgProps.height * scaledWidth) / imgProps.width;
-        pdf.addImage(imgData, 'PNG', marginLeft, 0, scaledWidth, scaledHeight);
+
+        if (scaledHeight <= pageHeight - marginTop) {
+          pdf.addImage(imgData, 'JPEG', marginLeft, marginTop, scaledWidth, scaledHeight, undefined, 'FAST');
+        } else {
+          const pageCanvas = document.createElement('canvas');
+          const pageCtx = pageCanvas.getContext('2d');
+          const ratio = canvas.width / scaledWidth;
+          const pageContentHeightMm = pageHeight - marginTop - 8;
+          const pageCanvasHeight = Math.floor(pageContentHeightMm * ratio);
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = pageCanvasHeight;
+          let sourceY = 0, pageIndex = 0;
+          while (sourceY < canvas.height) {
+            if (pageIndex > 0) pdf.addPage();
+            pageCtx.fillStyle = '#ffffff';
+            pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+            pageCtx.drawImage(canvas, 0, sourceY, canvas.width, pageCanvasHeight, 0, 0, pageCanvas.width, pageCanvas.height);
+            const pageImg = pageCanvas.toDataURL('image/jpeg', jpegQuality);
+            const visibleHeight = Math.min(pageCanvasHeight, canvas.height - sourceY);
+            const visibleHeightMm = visibleHeight / ratio;
+            pdf.addImage(pageImg, 'JPEG', marginLeft, marginTop, scaledWidth, visibleHeightMm, undefined, 'FAST');
+            sourceY += pageCanvasHeight;
+            pageIndex++;
+          }
+        }
         return pdf.output('blob');
       });
     }
@@ -832,22 +463,18 @@
     document.getElementById('sendTelegramBtn').addEventListener('click', function() {
       const statusEl = document.getElementById('pdfStatus');
       statusEl.style.display = 'inline';
-
       createPdfBlob().then(function(blob) {
+        if (blob.size > 4200000) {
+          throw new Error('PDF получился слишком большим: ' + (blob.size / 1024 / 1024).toFixed(2) + ' МБ. Уменьшите количество окон в одном расчёте или скачайте PDF вручную.');
+        }
         const formData = new FormData();
         formData.append('document', new File([blob], currentFilename(), { type: 'application/pdf' }));
         formData.append('caption', 'Расчёт мягких окон');
-
-        return fetch('/api/send-telegram', {
-          method: 'POST',
-          body: formData
-        });
+        return fetch('/api/send-telegram', { method: 'POST', body: formData });
       }).then(function(response) {
         statusEl.style.display = 'none';
         if (!response.ok) {
-          return response.text().then(function(text) {
-            throw new Error(text || 'Ошибка отправки');
-          });
+          return response.text().then(function(text) { throw new Error(text || 'Ошибка отправки'); });
         }
         alert('Расчёт отправлен в Telegram.');
       }).catch(function(err) {
@@ -859,24 +486,12 @@
 
     window.addEventListener('load', function() {
       document.getElementById('orderDate').value = new Date().toISOString().split('T')[0];
-
-      [
-        'pricePerM2',
-        'edgingPrice',
-        'strapPrice',
-        'zipperPrice',
-        'installPrice',
-        'edgingWidth'
-      ].forEach(function(id) {
+      ['pricePerM2','edgingPrice','strapPrice','zipperPrice','installPrice','edgingWidth'].forEach(function(id) {
         const input = document.getElementById(id);
         input.addEventListener('input', calculate);
         input.addEventListener('change', calculate);
       });
-
-      // Пример 1: прямоугольное окно без молнии
       addRow(200, 150, 150, 1, true, 4, false, 0, true, 0);
-
-      // Пример 2: проём с наклоном, молния с двух сторон
       addRow(120, 180, 150, 2, true, 6, true, 180, true, 8);
     });
   </script>

@@ -26,10 +26,7 @@ export async function POST(request) {
     const caption = incoming.get("caption") || "Расчёт мягких окон";
 
     if (!documentFile) {
-      return Response.json({
-        ok: false,
-        error: "No document file received"
-      }, { status: 400 });
+      return Response.json({ ok: false, error: "No document file received" }, { status: 400 });
     }
 
     const telegramForm = new FormData();
@@ -56,9 +53,6 @@ export async function POST(request) {
       headers: { "content-type": "application/json; charset=utf-8" }
     });
   } catch (error) {
-    return Response.json({
-      ok: false,
-      error: error.message || "Unknown server error"
-    }, { status: 500 });
+    return Response.json({ ok: false, error: error.message || "Unknown server error" }, { status: 500 });
   }
 }
