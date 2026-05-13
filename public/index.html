@@ -31,17 +31,32 @@
     .summary-card .title { font-size: 13px; color: #667085; margin-bottom: 6px; }
     .summary-card .value { font-size: 25px; font-weight: 900; color: #111827; }
     .pdf-preview-wrapper { margin-top: 16px; border: 1px solid #e4ebf3; border-radius: 14px; background: #fbfdff; padding: 18px; overflow-x: auto; }
-    #pdfLayout { background: #fff; padding: 12px; border-radius: 10px; }
-    .pdf-header { text-align: center; margin-bottom: 10px; }
-    .pdf-header h3 { margin: 0; font-size: 22px; }
-    .pdf-info { font-size: 14px; line-height: 1.45; margin-bottom: 14px; }
-    .pdf-drawings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
-    .pdf-drawing-item { border: 1px solid #e4ebf3; border-radius: 12px; padding: 10px; background: #fff; break-inside: avoid; }
-    .pdf-drawing-item h4 { margin: 0 0 8px; font-size: 16px; }
-    .pdf-drawing-item .meta { font-size: 13px; color: #4b5563; line-height: 1.4; margin-bottom: 8px; }
-    .pdf-summary { margin-top: 16px; font-size: 14px; line-height: 1.45; }
+    #pdfLayout {
+      background: #fff;
+      padding: 20px 22px;
+      border-radius: 10px;
+      min-width: 980px;
+      color: #111827;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+    .pdf-header {
+      text-align: center;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #dbe5f0;
+      padding-bottom: 12px;
+    }
+    .pdf-header h3 { margin: 0; font-size: 30px; line-height: 1.2; font-weight: 900; }
+    .pdf-info { font-size: 18px; line-height: 1.55; margin-bottom: 18px; color: #111827; font-weight: 600; }
+    .pdf-drawings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; }
+    .pdf-drawing-item { border: 1px solid #d9e3ee; border-radius: 14px; padding: 14px; background: #fff; break-inside: avoid; page-break-inside: avoid; }
+    .pdf-drawing-item h4 { margin: 0 0 10px; font-size: 22px; line-height: 1.2; font-weight: 900; }
+    .pdf-drawing-item .meta { font-size: 16px; color: #1f2933; line-height: 1.55; margin-bottom: 10px; font-weight: 600; }
+    .pdf-summary { margin-top: 18px; font-size: 18px; line-height: 1.6; color: #111827; font-weight: 600; }
+    .pdf-summary p { margin: 4px 0; }
     .hint { margin-top: 12px; color: #667085; font-size: 13px; line-height: 1.45; }
-    @media (max-width: 760px) { body { padding: 10px; } .container { padding: 14px; border-radius: 14px; } h1 { font-size: 24px; } h2 { font-size: 19px; } .summary-card .value { font-size: 21px; } .pdf-preview-wrapper { padding: 10px; } }
+    @media (max-width: 760px) { body { padding: 10px; } .container { padding: 14px; border-radius: 14px; } h1 { font-size: 24px; } h2 { font-size: 19px; } .summary-card .value { font-size: 21px; } .pdf-preview-wrapper { padding: 10px; } #pdfLayout { min-width: 860px; } }
     @media print { body { background: #fff; padding: 0; } .container { box-shadow: none; border-radius: 0; } .buttons, .hint { display: none !important; } }
   </style>
 </head>
@@ -63,7 +78,7 @@
       <div class="field"><label for="edgingPrice">Окантовка, ₽ / пог. м</label><input type="number" id="edgingPrice" value="120" min="0" step="1"></div>
       <div class="field"><label for="strapPrice">Ремень, ₽ / шт</label><input type="number" id="strapPrice" value="80" min="0" step="1"></div>
       <div class="field"><label for="zipperPrice">Молния, ₽ / пог. м</label><input type="number" id="zipperPrice" value="250" min="0" step="1"></div>
-      <div class="field"><label for="installPrice">Монтаж, ₽ / окно</label><input type="number" id="installPrice" value="500" min="0" step="1"></div>
+      <div class="field"><label for="installPrice">Монтаж, ₽ / м²</label><input type="number" id="installPrice" value="500" min="0" step="1"></div>
       <div class="field"><label for="edgingWidth">Ширина окантовки, см</label><input type="number" id="edgingWidth" value="5" min="0" step="0.1"></div>
     </div>
 
@@ -109,12 +124,33 @@
       <div class="summary-card"><div class="title">Итого</div><div class="value" id="grandTotal">0 ₽</div></div>
     </div>
 
+    <h2>Закуп материалов</h2>
+    <div class="hint">Для подбора ширины рулона к стороне, которая попадает в рулон, автоматически добавляется запас <b>9 см</b>. Если ширина больше 2,4 м, но высота с запасом входит в рулон, калькулятор разворачивает раскладку. SVG для ЧПУ строится по оптимизированному раскрою внутри каждого рулона. Для каждого рулона можно получить отдельный SVG, а в деталях проставляются размеры и подписи.</div>
+    <div class="table-responsive">
+      <table id="materialsTable">
+        <thead>
+          <tr>
+            <th>Материал</th>
+            <th>Ширина рулона</th>
+            <th>Нужно, м</th>
+            <th>Рулонов по 50 м</th>
+            <th>Остаток, м</th>
+            <th>Комментарий</th>
+          </tr>
+        </thead>
+        <tbody id="materialsBody">
+          <tr><td colspan="6">Добавьте окна — здесь появится расчёт закупа.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <h2>Превью PDF</h2>
     <div class="pdf-preview-wrapper"><div id="pdfLayout"></div></div>
 
     <div class="buttons">
       <button class="btn btn-primary" id="downloadPdfBtn">Скачать PDF</button>
-      <button class="btn btn-primary" id="sendTelegramBtn">Отправить в Telegram</button>
+      <button class="btn btn-primary" id="downloadSvgBtn">Скачать SVG для ЧПУ</button>
+      <button class="btn btn-primary" id="sendTelegramBtn">Отправить HTML в Telegram</button>
       <span id="pdfStatus" style="display:none; font-size:14px; color:#667085;">Создание PDF…</span>
     </div>
 
@@ -123,6 +159,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
 
   <script>
     const tableBody = document.getElementById('tableBody');
@@ -201,6 +239,435 @@
       return { index: index + 1, widthCm, height1Cm, height2Cm, maxHeightCm, qty, edgingChecked, strapsPerWindow, hasZipper, zipperCmPerSide, zipperOffsetCm, installChecked };
     }
 
+
+    
+    function createWindowPieces(rowsData) {
+      const pieces = [];
+      rowsData.forEach(function(item) {
+        for (let i = 0; i < item.qty; i++) {
+          pieces.push({
+            rowIndex: item.index,
+            pieceIndex: i + 1,
+            widthCm: item.widthCm,
+            maxHeightCm: item.maxHeightCm,
+            height1Cm: item.height1Cm,
+            height2Cm: item.height2Cm
+          });
+        }
+      });
+      return pieces;
+    }
+
+    
+    const CUT_OFFSET_CM = 4.5;
+
+    function polygonAreaCm(points) {
+      let a = 0;
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i];
+        const q = points[(i + 1) % points.length];
+        a += p.x * q.y - q.x * p.y;
+      }
+      return a / 2;
+    }
+
+    function lineIntersectionCm(p1, d1, p2, d2) {
+      const cross = d1.x * d2.y - d1.y * d2.x;
+      if (Math.abs(cross) < 0.000001) return { x: p1.x, y: p1.y };
+      const t = ((p2.x - p1.x) * d2.y - (p2.y - p1.y) * d2.x) / cross;
+      return { x: p1.x + d1.x * t, y: p1.y + d1.y * t };
+    }
+
+    function offsetPolygonCm(points, offsetCm) {
+      const ccw = polygonAreaCm(points) > 0;
+      const lines = [];
+
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i];
+        const q = points[(i + 1) % points.length];
+        const dx = q.x - p.x;
+        const dy = q.y - p.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+
+        // Внешняя нормаль. Это настоящий параллельный offset,
+        // поэтому трапеция с уклоном не превращается в прямоугольник.
+        const nx = ccw ? dy / len : -dy / len;
+        const ny = ccw ? -dx / len : dx / len;
+
+        lines.push({
+          p: { x: p.x + nx * offsetCm, y: p.y + ny * offsetCm },
+          d: { x: dx, y: dy }
+        });
+      }
+
+      const result = [];
+      for (let i = 0; i < lines.length; i++) {
+        const prev = lines[(i - 1 + lines.length) % lines.length];
+        const cur = lines[i];
+        result.push(lineIntersectionCm(prev.p, prev.d, cur.p, cur.d));
+      }
+      return result;
+    }
+
+    function bboxCm(points) {
+      const xs = points.map(p => p.x);
+      const ys = points.map(p => p.y);
+      const minX = Math.min.apply(null, xs);
+      const maxX = Math.max.apply(null, xs);
+      const minY = Math.min.apply(null, ys);
+      const maxY = Math.max.apply(null, ys);
+      return { minX, maxX, minY, maxY, width: maxX - minX, height: maxY - minY };
+    }
+
+    function normalizeByBBoxCm(points, box) {
+      return points.map(p => ({ x: p.x - box.minX, y: p.y - box.minY }));
+    }
+
+    function rotatePointsClockwiseCm(points, widthCm) {
+      return points.map(p => ({ x: p.y, y: widthCm - p.x }));
+    }
+
+    function pointsObjToArray(points) {
+      return points.map(p => [p.x, p.y]);
+    }
+
+    function buildPieceGeometryOptions(piece) {
+      const maxH = piece.maxHeightCm;
+
+      const opening = [
+        { x: 0, y: maxH - piece.height1Cm },
+        { x: piece.widthCm, y: maxH - piece.height2Cm },
+        { x: piece.widthCm, y: maxH },
+        { x: 0, y: maxH }
+      ];
+
+      const cutOffset = offsetPolygonCm(opening, CUT_OFFSET_CM);
+      const box = bboxCm(cutOffset);
+
+      const cutNormal = normalizeByBBoxCm(cutOffset, box);
+      const openingNormal = normalizeByBBoxCm(opening, box);
+
+      const normalOption = {
+        mode: 'normal',
+        crossCm: box.width,
+        alongCm: box.height,
+        rotated: false,
+        cutPoints: pointsObjToArray(cutNormal),
+        openingPoints: pointsObjToArray(openingNormal),
+        comment:
+          'Обычная раскладка: итоговая ширина резки ' + (box.width / 100).toFixed(2) +
+          ' м, итоговая высота резки ' + (box.height / 100).toFixed(2) + ' м'
+      };
+
+      // Поворот всей геометрии, а не просто прямоугольника.
+      const cutRotRaw = rotatePointsClockwiseCm(cutNormal, box.width);
+      const openingRotRaw = rotatePointsClockwiseCm(openingNormal, box.width);
+      const rotBox = bboxCm(cutRotRaw);
+      const cutRot = normalizeByBBoxCm(cutRotRaw, rotBox);
+      const openingRot = normalizeByBBoxCm(openingRotRaw, rotBox);
+
+      const rotatedOption = {
+        mode: 'rotated',
+        crossCm: rotBox.width,
+        alongCm: rotBox.height,
+        rotated: true,
+        cutPoints: pointsObjToArray(cutRot),
+        openingPoints: pointsObjToArray(openingRot),
+        comment:
+          'Поворот полотна: итоговая ширина резки ' + (rotBox.width / 100).toFixed(2) +
+          ' м, итоговая высота резки ' + (rotBox.height / 100).toFixed(2) + ' м'
+      };
+
+      return [normalOption, rotatedOption];
+    }
+
+function getMinAssignedRoll(piece) {
+      const rollWidths = [180, 220, 240];
+      const options = buildPieceGeometryOptions(piece);
+      let best = null;
+
+      options.forEach(function(option) {
+        const roll = rollWidths.find(function(w) { return option.crossCm <= w; }) || null;
+        if (!roll) return;
+
+        if (!best ||
+            roll < best.roll ||
+            (roll === best.roll && option.alongCm < best.option.alongCm) ||
+            (roll === best.roll && option.alongCm === best.option.alongCm && option.mode === 'normal')) {
+          best = { roll: roll, option: option };
+        }
+      });
+
+      return best ? best.roll : null;
+    }
+
+    function getFeasibleOrientationsForRoll(piece, rollWidthCm) {
+      return buildPieceGeometryOptions(piece).filter(function(option) {
+        return option.crossCm <= rollWidthCm + 0.0001;
+      });
+    }
+
+    function intervalMaxHeight(skyline, x, width) {
+      const xEnd = x + width;
+      let maxY = 0;
+      skyline.forEach(function(seg) {
+        const segEnd = seg.x + seg.width;
+        if (seg.x < xEnd && segEnd > x) {
+          if (seg.y > maxY) maxY = seg.y;
+        }
+      });
+      return maxY;
+    }
+
+    function insertSkylineSegment(skyline, x, width, topY) {
+      const xEnd = x + width;
+      const updated = [];
+
+      skyline.forEach(function(seg) {
+        const segEnd = seg.x + seg.width;
+        if (segEnd <= x || seg.x >= xEnd) {
+          updated.push(seg);
+        } else {
+          if (seg.x < x) {
+            updated.push({ x: seg.x, width: x - seg.x, y: seg.y });
+          }
+          if (segEnd > xEnd) {
+            updated.push({ x: xEnd, width: segEnd - xEnd, y: seg.y });
+          }
+        }
+      });
+
+      updated.push({ x: x, width: width, y: topY });
+      updated.sort(function(a, b) { return a.x - b.x; });
+
+      const merged = [];
+      updated.forEach(function(seg) {
+        if (seg.width <= 0) return;
+        const last = merged[merged.length - 1];
+        if (last && Math.abs((last.x + last.width) - seg.x) < 0.0001 && Math.abs(last.y - seg.y) < 0.0001) {
+          last.width += seg.width;
+        } else {
+          merged.push({ x: seg.x, width: seg.width, y: seg.y });
+        }
+      });
+
+      return merged;
+    }
+
+    function findBestPlacement(skyline, piece, rollWidthCm) {
+      const orientations = getFeasibleOrientationsForRoll(piece, rollWidthCm);
+      let best = null;
+
+      orientations.forEach(function(orientation) {
+        const candidateXs = skyline.map(function(seg) { return seg.x; });
+        candidateXs.forEach(function(x) {
+          if (x + orientation.crossCm > rollWidthCm + 0.0001) return;
+          const y = intervalMaxHeight(skyline, x, orientation.crossCm);
+          const bottom = y + orientation.alongCm;
+          const score = [bottom, y, orientation.crossCm];
+
+          if (!best ||
+              score[0] < best.score[0] ||
+              (score[0] === best.score[0] && score[1] < best.score[1]) ||
+              (score[0] === best.score[0] && score[1] === best.score[1] && score[2] < best.score[2])) {
+            best = {
+              xCm: x,
+              yCm: y,
+              crossCm: orientation.crossCm,
+              alongCm: orientation.alongCm,
+              orientation: orientation,
+              score: score
+            };
+          }
+        });
+      });
+
+      return best;
+    }
+
+    function buildPolygonPoints(placement) {
+      // Линия резки — это offset +4,5 см от фактического проёма.
+      // Для трапеции это тоже трапеция, а не габаритный прямоугольник.
+      return placement.orientation.cutPoints.map(function(pt) {
+        return [placement.xCm + pt[0], placement.yCm + pt[1]];
+      });
+    }
+
+    function buildOpeningPolygonPoints(placement) {
+      // Контур исходного проёма только для подсказки/контроля.
+      return placement.orientation.openingPoints.map(function(pt) {
+        return [placement.xCm + pt[0], placement.yCm + pt[1]];
+      });
+    }
+
+    function packPiecesForRoll(pieces, rollWidthCm) {
+      const skyline = [{ x: 0, width: rollWidthCm, y: 0 }];
+      const placements = [];
+      const sorted = pieces.slice().sort(function(a, b) {
+        const aSize = Math.max(a.widthCm, a.maxHeightCm);
+        const bSize = Math.max(b.widthCm, b.maxHeightCm);
+        return bSize - aSize;
+      });
+
+      sorted.forEach(function(piece) {
+        const best = findBestPlacement(skyline, piece, rollWidthCm);
+        if (!best) return;
+
+        best.piece = piece;
+        best.points = buildPolygonPoints(best);
+        best.openingPoints = buildOpeningPolygonPoints(best);
+        placements.push(best);
+
+        const newTop = best.yCm + best.alongCm;
+        const updated = insertSkylineSegment(skyline, best.xCm, best.crossCm, newTop);
+        skyline.length = 0;
+        updated.forEach(function(seg) { skyline.push(seg); });
+      });
+
+      let totalLengthCm = 0;
+      let rotatedCount = 0;
+      placements.forEach(function(p) {
+        totalLengthCm = Math.max(totalLengthCm, p.yCm + p.alongCm);
+        if (p.orientation.rotated) rotatedCount++;
+      });
+
+      return {
+        rollWidthCm: rollWidthCm,
+        totalLengthCm: totalLengthCm,
+        placements: placements,
+        rotatedCount: rotatedCount,
+        count: placements.length
+      };
+    }
+
+    function calculateMaterials(rowsData) {
+      const rollLength = 50;
+      const pieces = createWindowPieces(rowsData);
+      const grouped = { 180: [], 220: [], 240: [] };
+      let edgingMeters = 0;
+      const oversized = [];
+
+      rowsData.forEach(function(item) {
+        if (item.edgingChecked) {
+          const widthM = item.widthCm / 100;
+          const h1 = item.height1Cm / 100;
+          const h2 = item.height2Cm / 100;
+          const topSlope = Math.sqrt(Math.pow(widthM, 2) + Math.pow(h1 - h2, 2));
+          const perimeter = widthM + h1 + h2 + topSlope;
+          edgingMeters += perimeter * item.qty;
+        }
+      });
+
+      pieces.forEach(function(piece) {
+        const assignedRoll = getMinAssignedRoll(piece);
+        if (!assignedRoll) {
+          oversized.push(
+            'Окно ' + piece.rowIndex +
+            ': offset +4,5 см не помещается в рулоны 1,8 / 2,2 / 2,4 м'
+          );
+        } else {
+          grouped[assignedRoll].push(piece);
+        }
+      });
+
+      const layouts = [];
+      const rollRows = [];
+
+      Object.keys(grouped).forEach(function(key) {
+        const rollWidthCm = Number(key);
+        const items = grouped[key];
+        if (!items.length) return;
+
+        const layout = packPiecesForRoll(items, rollWidthCm);
+        layouts.push(layout);
+
+        const needMeters = layout.totalLengthCm / 100;
+        const rolls = Math.ceil(needMeters / rollLength);
+        const totalLength = rolls * rollLength;
+        const rest = totalLength - needMeters;
+
+        rollRows.push({
+          material: 'ПВХ полотно',
+          width: (rollWidthCm / 100).toFixed(1) + ' м',
+          need: needMeters,
+          rolls: rolls,
+          rest: rest,
+          comment:
+            'Рулон ' + (rollWidthCm / 100).toFixed(1) + ' м × 50 м. ' +
+            'Изделий: ' + layout.count + '. ' +
+            'Повернуто: ' + layout.rotatedCount + '. ' +
+            'Оптимизированная длина раскроя: ' + needMeters.toFixed(2) + ' м'
+        });
+      });
+
+      const edgingWithReserve = edgingMeters * 1.1;
+      const edgingRolls = edgingWithReserve > 0 ? Math.ceil(edgingWithReserve / rollLength) : 0;
+      const edgingRest = edgingRolls > 0 ? edgingRolls * rollLength - edgingWithReserve : 0;
+
+      const edgingRow = {
+        material: 'Окантовка',
+        width: '10 см',
+        need: edgingWithReserve,
+        rolls: edgingRolls,
+        rest: edgingRest,
+        comment: 'С запасом 10%. Без запаса: ' + edgingMeters.toFixed(1) + ' м'
+      };
+
+      return {
+        rollRows: rollRows,
+        edgingRow: edgingRow,
+        oversized: oversized,
+        layouts: layouts
+      };
+    }
+
+    function materialRowHtml(row) {
+      return `
+        <tr>
+          <td>${row.material}</td>
+          <td>${row.width}</td>
+          <td>${row.need.toFixed(1)} м</td>
+          <td>${row.rolls}</td>
+          <td>${row.rest.toFixed(1)} м</td>
+          <td>${row.comment}</td>
+        </tr>
+      `;
+    }
+
+    function materialsTableHtml(materials) {
+      let html = '';
+
+      materials.rollRows.forEach(function(row) {
+        html += materialRowHtml(row);
+      });
+
+      if (materials.edgingRow.need > 0) {
+        html += materialRowHtml(materials.edgingRow);
+      }
+
+      if (materials.oversized.length) {
+        html += `
+          <tr>
+            <td colspan="6" style="color:#b42318;font-weight:800;text-align:left;">
+              Нестандарт: ${materials.oversized.join('; ')}. Ширина больше 2,4 м — нужна стыковка или другой материал.
+            </td>
+          </tr>
+        `;
+      }
+
+      if (!html) {
+        html = '<tr><td colspan="6">Добавьте окна — здесь появится расчёт закупа.</td></tr>';
+      }
+
+      return html;
+    }
+
+    function updateMaterialsTable(materials) {
+      const body = document.getElementById('materialsBody');
+      if (!body) return;
+      body.innerHTML = materialsTableHtml(materials);
+    }
+
     function calculate() {
       const pricePerM2 = num(document.getElementById('pricePerM2').value);
       const edgingPrice = num(document.getElementById('edgingPrice').value);
@@ -211,9 +678,11 @@
 
       let totalQty = 0, totalArea = 0, baseTotal = 0, extraTotal = 0, grandTotal = 0;
       const drawingsData = [];
+      const rowsData = [];
 
       tableBody.querySelectorAll('tr').forEach(function(row, index) {
         const item = getRowData(row, index);
+        rowsData.push(item);
         const widthM = item.widthCm / 100;
         const maxHeightM = item.maxHeightCm / 100;
         const areaOne = widthM * maxHeightM;
@@ -225,7 +694,7 @@
         const edgingSum = item.edgingChecked ? perimeterOne * item.qty * edgingPrice : 0;
         const strapsSum = item.strapsPerWindow * item.qty * strapPrice;
         const zipperSum = item.hasZipper ? (item.zipperCmPerSide / 100) * 2 * item.qty * zipperPrice : 0;
-        const installSum = item.installChecked ? item.qty * installPrice : 0;
+        const installSum = item.installChecked ? areaTotal * installPrice : 0;
         const extrasSum = edgingSum + strapsSum + zipperSum + installSum;
         const rowTotal = baseSum + extrasSum;
 
@@ -251,96 +720,138 @@
       document.getElementById('extraTotal').textContent = money(extraTotal);
       document.getElementById('grandTotal').textContent = money(grandTotal);
 
+      const materials = calculateMaterials(rowsData);
+      window.__lastMaterialsResult = materials;
+      updateMaterialsTable(materials);
+
       updatePdfLayout(drawingsData, {
         orderNumber: document.getElementById('orderNumber').value,
         clientName: document.getElementById('clientName').value,
         clientAddress: document.getElementById('clientAddress').value,
         orderDate: document.getElementById('orderDate').value,
-        totalQty, totalArea, baseTotal, extraTotal, grandTotal, edgingWidth
+        totalQty, totalArea, baseTotal, extraTotal, grandTotal, edgingWidth,
+        materials: materials
       });
     }
 
     function makeDrawingSVG(widthCm, height1Cm, height2Cm, index, straps, hasZipper, zipperCmPerSide, edgingWidthCm, zipperOffsetCm) {
-      const svgWidth = 340, svgHeight = 245, maxRectWidth = 210, maxRectHeight = 135;
+      const svgWidth = 360, svgHeight = 320, maxRectWidth = 220, maxRectHeight = 170;
       const maxHeightCm = Math.max(height1Cm, height2Cm);
-      const outerWidthCm = widthCm + 2 * edgingWidthCm;
-      const outerHeightCm = maxHeightCm + 2 * edgingWidthCm;
-      let scale = Math.min(maxRectWidth / Math.max(outerWidthCm, 1), maxRectHeight / Math.max(outerHeightCm, 1));
-      if (outerWidthCm * scale < 64) scale = 64 / outerWidthCm;
 
-      const outerW = outerWidthCm * scale;
-      const outerX = (svgWidth - outerW) / 2;
-      const outerTopY = 66;
-      const innerX = outerX + edgingWidthCm * scale;
-      const innerW = widthCm * scale;
-      const bottomY = outerTopY + (edgingWidthCm + maxHeightCm) * scale;
-      const innerTopLeftY = outerTopY + edgingWidthCm * scale + (maxHeightCm - height1Cm) * scale;
-      const innerTopRightY = outerTopY + edgingWidthCm * scale + (maxHeightCm - height2Cm) * scale;
-      const outerTopLeftY = innerTopLeftY - edgingWidthCm * scale;
-      const outerTopRightY = innerTopRightY - edgingWidthCm * scale;
-      const outerBottomY = bottomY + edgingWidthCm * scale;
-      const outerRightX = innerX + innerW + edgingWidthCm * scale;
-      const dimStroke = hasZipper ? 1.0 : 1.4;
+      const inner = [
+        {x: 0, y: maxHeightCm - height1Cm},
+        {x: widthCm, y: maxHeightCm - height2Cm},
+        {x: widthCm, y: maxHeightCm},
+        {x: 0, y: maxHeightCm}
+      ];
 
-      const outerPoints = `${outerX},${outerTopLeftY} ${outerRightX},${outerTopRightY} ${outerRightX},${outerBottomY} ${outerX},${outerBottomY}`;
-      const innerPoints = `${innerX},${innerTopLeftY} ${innerX + innerW},${innerTopRightY} ${innerX + innerW},${bottomY} ${innerX},${bottomY}`;
+      function area(points) {
+        let a = 0;
+        for (let i = 0; i < points.length; i++) {
+          const p = points[i], q = points[(i + 1) % points.length];
+          a += p.x * q.y - q.x * p.y;
+        }
+        return a / 2;
+      }
+
+      function intersect(p1, d1, p2, d2) {
+        const c = d1.x * d2.y - d1.y * d2.x;
+        if (Math.abs(c) < 0.000001) return {x:p1.x, y:p1.y};
+        const t = ((p2.x-p1.x)*d2.y - (p2.y-p1.y)*d2.x) / c;
+        return {x:p1.x + d1.x*t, y:p1.y + d1.y*t};
+      }
+
+      function offsetPoly(points, off) {
+        const ccw = area(points) > 0;
+        const lines = [];
+        for (let i = 0; i < points.length; i++) {
+          const p = points[i], q = points[(i + 1) % points.length];
+          const dx = q.x - p.x, dy = q.y - p.y;
+          const len = Math.sqrt(dx*dx + dy*dy) || 1;
+          const nx = ccw ? dy / len : -dy / len;
+          const ny = ccw ? -dx / len : dx / len;
+          lines.push({p:{x:p.x + nx*off, y:p.y + ny*off}, d:{x:dx, y:dy}});
+        }
+        return lines.map((ln, i) => {
+          const prev = lines[(i - 1 + lines.length) % lines.length];
+          return intersect(prev.p, prev.d, ln.p, ln.d);
+        });
+      }
+
+      const outer = offsetPoly(inner, edgingWidthCm);
+      const all = inner.concat(outer);
+      const minX = Math.min(...all.map(p=>p.x)), maxX = Math.max(...all.map(p=>p.x));
+      const minY = Math.min(...all.map(p=>p.y)), maxY = Math.max(...all.map(p=>p.y));
+      const outerW = maxX - minX, outerH = maxY - minY;
+      let scale = Math.min(maxRectWidth / Math.max(outerW,1), maxRectHeight / Math.max(outerH,1));
+      if (outerW * scale < 70) scale = 70 / Math.max(outerW,1);
+
+      // Защита от обрезания снизу для узких и высоких проёмов.
+      // Особенно заметно при ширине меньше 70 см и высоте 170–220 см.
+      const maxAllowedHeightPx = 210;
+      if (outerH * scale > maxAllowedHeightPx) {
+        scale = maxAllowedHeightPx / Math.max(outerH, 1);
+      }
+
+      const ox = (svgWidth - outerW*scale)/2 - minX*scale;
+      const oy = 88 - minY*scale;
+      const sx = x => ox + x*scale;
+      const sy = y => oy + y*scale;
+      const pts = a => a.map(p => sx(p.x)+','+sy(p.y)).join(' ');
+
+      const innerX = sx(0), innerRightX = sx(widthCm);
+      const bottomY = sy(maxHeightCm);
+      const topLeftY = sy(maxHeightCm - height1Cm);
+      const topRightY = sy(maxHeightCm - height2Cm);
+      const outerX = Math.min(...outer.map(p=>sx(p.x)));
+      const outerRightX = Math.max(...outer.map(p=>sx(p.x)));
+      const outerTopY = Math.min(...outer.map(p=>sy(p.y)));
 
       let strapElements = '';
       if (straps > 0) {
-        const spacing = innerW / (straps + 1);
-        for (let i = 1; i <= straps; i++) {
-          const cx = innerX + spacing * i;
-          const topYAtX = innerTopLeftY + (innerTopRightY - innerTopLeftY) * (i / (straps + 1));
-          strapElements += `<circle cx="${cx}" cy="${topYAtX}" r="4" fill="#e74c3c" stroke="#b03a2e" stroke-width="1"/>`;
+        const spacing = (innerRightX - innerX) / (straps + 1);
+        for (let i=1;i<=straps;i++) {
+          const cx = innerX + spacing*i;
+          const cy = topLeftY + (topRightY-topLeftY)*(i/(straps+1));
+          strapElements += `<circle cx="${cx}" cy="${cy}" r="3" fill="#c84d3a" stroke="#9b3425" stroke-width="0.7"/>`;
         }
       }
 
       let zipperElements = '';
       if (hasZipper && zipperCmPerSide > 0) {
-        const zipperLengthPx = Math.min(zipperCmPerSide, maxHeightCm) * scale;
-        const zipperStartY = bottomY - zipperLengthPx;
-        const zipperEndY = bottomY;
-        const offsetPx = zipperOffsetCm * scale;
-        const leftZipperX = outerX + offsetPx;
-        const rightZipperX = outerRightX - offsetPx;
-        zipperElements += `<line x1="${leftZipperX}" y1="${zipperStartY}" x2="${leftZipperX}" y2="${zipperEndY}" stroke="#8e44ad" stroke-width="2" stroke-dasharray="5 4"/>`;
-        zipperElements += `<line x1="${rightZipperX}" y1="${zipperStartY}" x2="${rightZipperX}" y2="${zipperEndY}" stroke="#8e44ad" stroke-width="2" stroke-dasharray="5 4"/>`;
+        const lenPx = Math.min(zipperCmPerSide, maxHeightCm) * scale;
+        const zStart = bottomY - lenPx, zEnd = bottomY, offsetPx = zipperOffsetCm * scale;
+        const lx = outerX + offsetPx, rx = outerRightX - offsetPx;
+        zipperElements += `<line x1="${lx}" y1="${zStart}" x2="${lx}" y2="${zEnd}" stroke="#7e3f98" stroke-width="1.2" stroke-dasharray="4 3"/>`;
+        zipperElements += `<line x1="${rx}" y1="${zStart}" x2="${rx}" y2="${zEnd}" stroke="#7e3f98" stroke-width="1.2" stroke-dasharray="4 3"/>`;
         if (zipperOffsetCm > 0) {
-          const offsetLineY = Math.min(outerTopLeftY, outerTopRightY) - 28;
-          const leftMid = (outerX + leftZipperX) / 2;
-          const rightMid = (rightZipperX + outerRightX) / 2;
-          zipperElements += `<line x1="${outerX}" y1="${offsetLineY}" x2="${leftZipperX}" y2="${offsetLineY}" stroke="#34495e" stroke-width="${dimStroke}" marker-start="url(#arrow-start-${index})" marker-end="url(#arrow-end-${index})"/>`;
-          zipperElements += `<text x="${leftMid}" y="${offsetLineY - 6}" text-anchor="middle" font-size="11" font-weight="700" fill="#34495e">${zipperOffsetCm} см</text>`;
-          zipperElements += `<line x1="${rightZipperX}" y1="${offsetLineY}" x2="${outerRightX}" y2="${offsetLineY}" stroke="#34495e" stroke-width="${dimStroke}" marker-start="url(#arrow-start-${index})" marker-end="url(#arrow-end-${index})"/>`;
-          zipperElements += `<text x="${rightMid}" y="${offsetLineY - 6}" text-anchor="middle" font-size="11" font-weight="700" fill="#34495e">${zipperOffsetCm} см</text>`;
+          const y = outerTopY - 28;
+          zipperElements += `<line x1="${outerX}" y1="${y}" x2="${lx}" y2="${y}" stroke="#425466" stroke-width="0.9"/><circle cx="${outerX}" cy="${y}" r="1.6" fill="#425466"/><circle cx="${lx}" cy="${y}" r="1.6" fill="#425466"/><text x="${(outerX+lx)/2}" y="${y-5}" text-anchor="middle" font-size="11" font-weight="500" fill="#425466">${zipperOffsetCm} см</text>`;
+          zipperElements += `<line x1="${rx}" y1="${y}" x2="${outerRightX}" y2="${y}" stroke="#425466" stroke-width="0.9"/><circle cx="${rx}" cy="${y}" r="1.6" fill="#425466"/><circle cx="${outerRightX}" cy="${y}" r="1.6" fill="#425466"/><text x="${(rx+outerRightX)/2}" y="${y-5}" text-anchor="middle" font-size="11" font-weight="500" fill="#425466">${zipperOffsetCm} см</text>`;
         }
       }
 
-      const widthLineY = Math.min(outerTopLeftY, outerTopRightY) - 14;
-      const leftHeightLineX = innerX - 18;
-      const rightHeightLineX = innerX + innerW + 18;
-      const leftHeightMidY = innerTopLeftY + (bottomY - innerTopLeftY) / 2;
-      const rightHeightMidY = innerTopRightY + (bottomY - innerTopRightY) / 2;
+      const widthY = Math.max(34, outerTopY - 14);
+      const leftHX = innerX - 18, rightHX = innerRightX + 18;
+      const leftMidY = topLeftY + (bottomY - topLeftY)/2;
+      const rightMidY = topRightY + (bottomY - topRightY)/2;
 
       return `
-        <svg width="100%" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <marker id="arrow-start-${index}" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="#34495e"/></marker>
-            <marker id="arrow-end-${index}" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#34495e"/></marker>
-          </defs>
-          <polygon points="${outerPoints}" fill="#f7d9c4" stroke="#8b5a2b" stroke-width="2"/>
-          <polygon points="${innerPoints}" fill="#dfeeff" stroke="#1f6feb" stroke-width="2"/>
-          <text x="${innerX + innerW / 2}" y="${bottomY - (maxHeightCm * scale) / 2}" text-anchor="middle" font-size="16" font-weight="800" fill="#1f2d3d">Окно ${index}</text>
-          <line x1="${innerX}" y1="${widthLineY}" x2="${innerX + innerW}" y2="${widthLineY}" stroke="#34495e" stroke-width="${dimStroke}" marker-start="url(#arrow-start-${index})" marker-end="url(#arrow-end-${index})"/>
-          <text x="${innerX + innerW / 2}" y="${widthLineY - 7}" text-anchor="middle" font-size="12" font-weight="800" fill="#34495e">${widthCm} см</text>
-          <line x1="${leftHeightLineX}" y1="${innerTopLeftY}" x2="${leftHeightLineX}" y2="${bottomY}" stroke="#34495e" stroke-width="${dimStroke}" marker-start="url(#arrow-start-${index})" marker-end="url(#arrow-end-${index})"/>
-          <text x="${leftHeightLineX - 8}" y="${leftHeightMidY}" text-anchor="middle" font-size="12" font-weight="800" fill="#34495e" transform="rotate(-90 ${leftHeightLineX - 8} ${leftHeightMidY})">${height1Cm} см</text>
-          <line x1="${rightHeightLineX}" y1="${innerTopRightY}" x2="${rightHeightLineX}" y2="${bottomY}" stroke="#34495e" stroke-width="${dimStroke}" marker-start="url(#arrow-start-${index})" marker-end="url(#arrow-end-${index})"/>
-          <text x="${rightHeightLineX + 10}" y="${rightHeightMidY}" text-anchor="middle" font-size="12" font-weight="800" fill="#34495e" transform="rotate(-90 ${rightHeightLineX + 10} ${rightHeightMidY})">${height2Cm} см</text>
+        <svg width="100%" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+          <polygon points="${pts(outer)}" fill="#f7d9c4" stroke="#8b5a2b" stroke-width="1"/>
+          <polygon points="${pts(inner)}" fill="#dfeeff" stroke="#1f6feb" stroke-width="1"/>
+          <line x1="${innerX}" y1="${widthY}" x2="${innerRightX}" y2="${widthY}" stroke="#425466" stroke-width="0.9"/>
+          <circle cx="${innerX}" cy="${widthY}" r="1.6" fill="#425466"/><circle cx="${innerRightX}" cy="${widthY}" r="1.6" fill="#425466"/>
+          <text x="${(innerX+innerRightX)/2}" y="${widthY-5}" text-anchor="middle" font-size="11" font-weight="500" fill="#425466">${widthCm} см</text>
+          <line x1="${leftHX}" y1="${topLeftY}" x2="${leftHX}" y2="${bottomY}" stroke="#425466" stroke-width="0.9"/>
+          <circle cx="${leftHX}" cy="${topLeftY}" r="1.6" fill="#425466"/><circle cx="${leftHX}" cy="${bottomY}" r="1.6" fill="#425466"/>
+          <text x="${leftHX-8}" y="${leftMidY}" text-anchor="middle" font-size="11" font-weight="500" fill="#425466" transform="rotate(-90 ${leftHX-8} ${leftMidY})">${height1Cm} см</text>
+          <line x1="${rightHX}" y1="${topRightY}" x2="${rightHX}" y2="${bottomY}" stroke="#425466" stroke-width="0.9"/>
+          <circle cx="${rightHX}" cy="${topRightY}" r="1.6" fill="#425466"/><circle cx="${rightHX}" cy="${bottomY}" r="1.6" fill="#425466"/>
+          <text x="${rightHX+8}" y="${rightMidY}" text-anchor="middle" font-size="11" font-weight="500" fill="#425466" transform="rotate(-90 ${rightHX+8} ${rightMidY})">${height2Cm} см</text>
           ${strapElements}
           ${zipperElements}
-        </svg>
-      `;
+        </svg>`;
     }
 
     function updatePdfLayout(drawingsData, summary) {
@@ -353,7 +864,12 @@
 
       const info = document.createElement('div');
       info.className = 'pdf-info';
-      info.innerHTML = `<div><strong>Клиент:</strong> ${summary.clientName || '-'}</div><div><strong>Адрес:</strong> ${summary.clientAddress || '-'}</div><div><strong>Дата:</strong> ${summary.orderDate || '-'}</div><div><strong>Принцип площади:</strong> ширина × большая высота</div>`;
+      info.innerHTML = `
+        <div><strong>Клиент:</strong> ${summary.clientName || '-'}</div>
+        <div><strong>Адрес:</strong> ${summary.clientAddress || '-'}</div>
+        <div><strong>Дата:</strong> ${summary.orderDate || '-'}</div>
+        <div><strong>Принцип площади:</strong> ширина × большая высота</div>
+      `;
       container.appendChild(info);
 
       const drawingsWrap = document.createElement('div');
@@ -366,7 +882,6 @@
           const offsetLine = (item.hasZipper && item.zipperOffsetCm > 0) ? `Отступ молнии: ${item.zipperOffsetCm} см от края окантовки<br>` : '';
           const shapeLine = item.height1Cm === item.height2Cm ? 'Форма: прямоугольник<br>' : 'Форма: проём с наклоном<br>';
           itemDiv.innerHTML = `
-            <h4>Окно ${item.index}</h4>
             <div class="meta">
               Размер: ${item.widthCm} × ${item.height1Cm} / ${item.height2Cm} см<br>
               Расчётная высота: ${item.maxHeightCm} см<br>
@@ -377,25 +892,33 @@
               Окантовка: ${item.edgingWidth} см<br>
               ${offsetLine}
             </div>
-            <div>${makeDrawingSVG(item.widthCm, item.height1Cm, item.height2Cm, item.index, item.straps, item.hasZipper, item.zipperCmPerSide, item.edgingWidth, item.zipperOffsetCm)}</div>`;
+            <div>${makeDrawingSVG(item.widthCm, item.height1Cm, item.height2Cm, item.index, item.straps, item.hasZipper, item.zipperCmPerSide, item.edgingWidth, item.zipperOffsetCm)}</div>
+            <div style="margin-top:6px;text-align:center;font-size:16px;font-weight:600;color:#1f2933;">Окно ${item.index}</div>`;
           drawingsWrap.appendChild(itemDiv);
         });
       } else {
-        drawingsWrap.innerHTML = `<div class="pdf-drawing-item"><div style="padding:20px;text-align:center;color:#667085;">Добавьте окно — здесь появится чертёж.</div></div>`;
+        drawingsWrap.innerHTML = `<div class="pdf-drawing-item"><div style="padding:24px;text-align:center;color:#667085;font-size:18px;">Добавьте окно — здесь появится чертёж.</div></div>`;
       }
       container.appendChild(drawingsWrap);
 
       const summaryDiv = document.createElement('div');
       summaryDiv.className = 'pdf-summary';
-      summaryDiv.innerHTML = `<p><b>Всего окон:</b> ${summary.totalQty}</p><p><b>Общая площадь:</b> ${summary.totalArea.toFixed(2)} м²</p><p><b>Сумма по полотну:</b> ${money(summary.baseTotal)}</p><p><b>Сумма допов:</b> ${money(summary.extraTotal)}</p><p><b>Итого:</b> ${money(summary.grandTotal)}</p><p><b>Ширина окантовки:</b> ${summary.edgingWidth} см</p>`;
+      summaryDiv.innerHTML = `
+        <p><b>Всего окон:</b> ${summary.totalQty}</p>
+        <p><b>Общая площадь:</b> ${summary.totalArea.toFixed(2)} м²</p>
+        <p><b>Сумма по полотну:</b> ${money(summary.baseTotal)}</p>
+        <p><b>Сумма допов:</b> ${money(summary.extraTotal)}</p>
+        <p><b>Итого:</b> ${money(summary.grandTotal)}</p>
+        <p><b>Ширина окантовки:</b> ${summary.edgingWidth} см</p>
+      `;
       container.appendChild(summaryDiv);
     }
 
     function createPdfBlob() {
       const pdfContainer = document.getElementById('pdfLayout');
       const isMobile = (window.innerWidth || document.documentElement.clientWidth) < 768;
-      const renderScale = isMobile ? 0.75 : 0.9;
-      const jpegQuality = 0.52;
+      const renderScale = isMobile ? 0.95 : 1.12;
+      const jpegQuality = 0.58;
 
       return html2canvas(pdfContainer, { scale: renderScale, backgroundColor: '#ffffff', useCORS: true }).then(function(canvas) {
         const imgData = canvas.toDataURL('image/jpeg', jpegQuality);
@@ -435,6 +958,327 @@
       });
     }
 
+
+    
+    
+    function buildOpeningContourPointsM(p, marginCm) {
+      const piece = p.piece;
+      const maxH = piece.maxHeightCm;
+      const x0 = marginCm / 100 + p.xCm / 100;
+      const y0 = marginCm / 100 + p.yCm / 100;
+      const crossM = p.crossCm / 100;
+      const alongM = p.alongCm / 100;
+      const leftInsetM = (p.orientation.leftInsetCm || 0) / 100;
+      const leftTopInsetM = (p.orientation.leftTopInsetCm || 0) / 100;
+      const rightTopInsetM = (p.orientation.rightTopInsetCm || 0) / 100;
+
+      if (p.orientation.mode === 'normal') {
+        return [
+          [x0 + leftTopInsetM, y0],
+          [x0 + crossM - rightTopInsetM, y0],
+          [x0 + crossM, y0 + alongM],
+          [x0, y0 + alongM]
+        ];
+      }
+
+      // rotated: внешний левый край прямой, а внутренний проём смещаем вправо.
+      return [
+        [x0 + leftInsetM, y0],
+        [x0 + crossM, y0],
+        [x0 + crossM, y0 + alongM],
+        [x0, y0 + alongM]
+      ];
+    }
+
+    function pointsToSvgString(points) {
+      return points.map(function(pt) {
+        return pt[0].toFixed(3) + ',' + pt[1].toFixed(3);
+      }).join(' ');
+    }
+
+    function buildSingleRollSvg(layout, orderNumber, layoutIndex, totalLayouts) {
+      const marginMm = 55;
+      const headerMm = 60;
+      const footerMm = 40;
+
+      const rollWidthMm = layout.rollWidthCm * 10;
+      const rollLengthMm = Math.max(layout.totalLengthCm * 10, 1);
+
+      const viewWidthMm = rollWidthMm + marginMm * 2;
+      const viewHeightMm = rollLengthMm + marginMm * 2 + headerMm + footerMm;
+
+      const rollX = marginMm;
+      const rollY = marginMm + headerMm;
+
+      function toMmPoints(pointsCm) {
+        return pointsCm.map(function(pt) {
+          return [rollX + pt[0] * 10, rollY + pt[1] * 10];
+        });
+      }
+
+      function pointsToPath(points) {
+        if (!points.length) return '';
+        return 'M ' + points.map(function(pt) {
+          return pt[0].toFixed(2) + ' ' + pt[1].toFixed(2);
+        }).join(' L ') + ' Z';
+      }
+
+      function distMm(a, b) {
+        const dx = b[0] - a[0];
+        const dy = b[1] - a[1];
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      function sideLabel(a, b, label, color, offsetMm, fontSize) {
+        const mx = (a[0] + b[0]) / 2;
+        const my = (a[1] + b[1]) / 2;
+        const dx = b[0] - a[0];
+        const dy = b[1] - a[1];
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        const nx = -dy / len;
+        const ny = dx / len;
+
+        let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        if (angle > 90 || angle < -90) angle += 180;
+
+        const tx = mx + nx * offsetMm;
+        const ty = my + ny * offsetMm;
+
+        return `
+          <line x1="${a[0].toFixed(2)}" y1="${a[1].toFixed(2)}" x2="${b[0].toFixed(2)}" y2="${b[1].toFixed(2)}"
+                stroke="${color}" stroke-width="0.20" stroke-dasharray="4 3"/>
+          <text x="${tx.toFixed(2)}" y="${ty.toFixed(2)}"
+                text-anchor="middle" font-size="${fontSize}" font-family="Arial" font-weight="400"
+                fill="${color}" transform="rotate(${angle.toFixed(2)} ${tx.toFixed(2)} ${ty.toFixed(2)})">${label}</text>
+        `;
+      }
+
+      let rollContent = `
+        <rect id="roll_${layoutIndex + 1}" x="${rollX.toFixed(2)}" y="${rollY.toFixed(2)}"
+              width="${rollWidthMm.toFixed(2)}" height="${rollLengthMm.toFixed(2)}"
+              fill="none" stroke="#8b4513" stroke-width="0.5"/>
+      `;
+
+      let blankContent = '';
+      let cutContent = '';
+      let openingContent = '';
+      let cutDimensionContent = '';
+      let openingDimensionContent = '';
+      let labelContent = `
+        <text x="${(viewWidthMm / 2).toFixed(2)}" y="${(marginMm + 22).toFixed(2)}"
+              text-anchor="middle" font-size="18" font-family="Arial" font-weight="400" fill="#111">
+          Заказ ${orderNumber || '-'} — рулон ${(layout.rollWidthCm / 100).toFixed(1)} м — файл ${layoutIndex + 1} из ${totalLayouts}
+        </text>
+      `;
+
+      layout.placements.forEach(function(p, i) {
+        const cutPointsMm = toMmPoints(p.points);
+        const openingPointsMm = toMmPoints(p.openingPoints || p.points);
+
+        const cutXs = cutPointsMm.map(function(pt) { return pt[0]; });
+        const cutYs = cutPointsMm.map(function(pt) { return pt[1]; });
+        const minX = Math.min.apply(null, cutXs);
+        const maxX = Math.max.apply(null, cutXs);
+        const minY = Math.min.apply(null, cutYs);
+        const maxY = Math.max.apply(null, cutYs);
+
+        const blankPointsMm = [
+          [minX, minY],
+          [maxX, minY],
+          [maxX, maxY],
+          [minX, maxY]
+        ];
+
+        const detailLabel = 'Окно ' + p.piece.rowIndex + ' / деталь ' + p.piece.pieceIndex;
+
+        // Коричневый слой — рулон.
+        // Синий слой — габарит заготовки/занимаемое место в раскрое.
+        blankContent += `
+          <polygon id="blank_${layoutIndex + 1}_${i + 1}" points="${pointsToSvgString(blankPointsMm)}"
+                   fill="none" stroke="#0066ff" stroke-width="0.25" stroke-dasharray="6 4"/>
+        `;
+
+        // Красный слой — реальная резка offset +4,5 см.
+        // Для трапеции это трапеция offset, а не прямоугольник.
+        cutContent += `
+          <path id="cut_window_${p.piece.rowIndex}_detail_${p.piece.pieceIndex}"
+                inkscape:label="Резка — ${detailLabel}"
+                d="${pointsToPath(cutPointsMm)}"
+                fill="none" stroke="#ff0000" stroke-width="0.35"/>
+        `;
+
+        // Зелёный слой — исходный контур проёма.
+        openingContent += `
+          <path id="opening_window_${p.piece.rowIndex}_detail_${p.piece.pieceIndex}"
+                inkscape:label="Контур проёма — ${detailLabel}"
+                d="${pointsToPath(openingPointsMm)}"
+                fill="none" stroke="#008000" stroke-width="0.25" stroke-dasharray="6 4"/>
+        `;
+
+        // Оранжевый слой — размеры сторон резки.
+        for (let e = 0; e < cutPointsMm.length; e++) {
+          const a = cutPointsMm[e];
+          const b = cutPointsMm[(e + 1) % cutPointsMm.length];
+          cutDimensionContent += sideLabel(a, b, (distMm(a, b) / 1000).toFixed(2) + ' м', '#ff9900', -14, 14);
+        }
+
+        // Зелёный слой — размеры сторон исходного проёма.
+        for (let e = 0; e < openingPointsMm.length; e++) {
+          const a = openingPointsMm[e];
+          const b = openingPointsMm[(e + 1) % openingPointsMm.length];
+          openingDimensionContent += sideLabel(a, b, (distMm(a, b) / 1000).toFixed(2) + ' м', '#008000', 12, 12);
+        }
+
+        labelContent += `
+          <text x="${((minX + maxX) / 2).toFixed(2)}" y="${((minY + maxY) / 2).toFixed(2)}"
+                text-anchor="middle" font-size="18" font-family="Arial" font-weight="400" fill="#111">${detailLabel}</text>
+        `;
+      });
+
+      return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     width="${viewWidthMm.toFixed(2)}mm"
+     height="${viewHeightMm.toFixed(2)}mm"
+     viewBox="0 0 ${viewWidthMm.toFixed(2)} ${viewHeightMm.toFixed(2)}">
+  <g id="layer_cut" inkscape:label="Резка" inkscape:groupmode="layer">${cutContent}</g>
+  <g id="layer_opening" inkscape:label="Контур проема" inkscape:groupmode="layer">${openingContent}</g>
+  <g id="layer_offset" inkscape:label="Офсет +4,5 см / габарит" inkscape:groupmode="layer">${blankContent}</g>
+  <g id="layer_roll" inkscape:label="Рулон" inkscape:groupmode="layer">${rollContent}</g>
+  <g id="layer_opening_dimensions" inkscape:label="Размеры сторон проема" inkscape:groupmode="layer">${openingDimensionContent}</g>
+  <g id="layer_cut_dimensions" inkscape:label="Размеры сторон резки" inkscape:groupmode="layer">${cutDimensionContent}</g>
+  <g id="layer_labels" inkscape:label="Подписи" inkscape:groupmode="layer">${labelContent}</g>
+</svg>`;
+    }
+
+    function buildCncSvgFiles(materials, orderNumber) {
+      const layouts = (materials && materials.layouts) ? materials.layouts : [];
+      return layouts.map(function(layout, index) {
+        const widthLabel = (layout.rollWidthCm / 100).toFixed(1).replace('.', '_');
+        return {
+          filename: 'soft_windows_cut_' + (orderNumber || 'order') + '_roll_' + widthLabel + 'm_' + (index + 1) + '.svg',
+          content: buildSingleRollSvg(layout, orderNumber, index, layouts.length)
+        };
+      });
+    }
+
+    async function downloadCncSvg() {
+      calculate();
+      const materials = window.__lastMaterialsResult;
+      if (!materials || !materials.layouts || !materials.layouts.length) {
+        alert('Нет данных для SVG-раскроя. Добавьте окна с корректными размерами.');
+        return;
+      }
+
+      const orderNumber = document.getElementById('orderNumber').value || 'order';
+      const files = buildCncSvgFiles(materials, orderNumber);
+
+      if (files.length === 1) {
+        const blob = new Blob([files[0].content], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = files[0].filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        return;
+      }
+
+      if (typeof JSZip !== 'undefined') {
+        const zip = new JSZip();
+        files.forEach(function(file) {
+          zip.file(file.filename, file.content);
+        });
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'soft_windows_cut_' + orderNumber + '.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } else {
+        files.forEach(function(file, index) {
+          setTimeout(function() {
+            const blob = new Blob([file.content], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = file.filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          }, index * 300);
+        });
+      }
+    }
+
+    function currentHtmlFilename() {
+      const orderNumber = document.getElementById('orderNumber').value || 'order';
+      return 'soft_windows_' + orderNumber + '.html';
+    }
+
+    function escapeHtmlForTitle(value) {
+      return String(value || '').replace(/[<>&"']/g, function(ch) {
+        return ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'})[ch];
+      });
+    }
+
+    function createHtmlBlob() {
+      calculate();
+
+      const pdfLayout = document.getElementById('pdfLayout');
+      const materialsTable = document.getElementById('materialsTable');
+      const orderNumber = document.getElementById('orderNumber').value || '';
+      const pageTitle = 'Расчёт мягких окон' + (orderNumber ? ' № ' + orderNumber : '');
+
+      const materialsSection = materialsTable ? `
+        <div class="pdf-summary" style="margin-top:24px;">
+          <h3 style="font-size:22px;margin:0 0 10px;">Закуп материалов</h3>
+          ${materialsTable.outerHTML}
+        </div>
+      ` : '';
+
+      const htmlDoc = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtmlForTitle(pageTitle)}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; background: #f3f6fa; color: #111827; font-family: Arial, Helvetica, sans-serif; -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+    .page { max-width: 1120px; margin: 0 auto; background: #fff; border-radius: 14px; padding: 24px 28px; box-shadow: 0 8px 28px rgba(0,0,0,0.08); }
+    .pdf-header { text-align: center; margin-bottom: 16px; border-bottom: 2px solid #dbe5f0; padding-bottom: 12px; }
+    .pdf-header h3 { margin: 0; font-size: 30px; line-height: 1.2; font-weight: 900; }
+    .pdf-info { font-size: 18px; line-height: 1.55; margin-bottom: 18px; color: #111827; font-weight: 600; }
+    .pdf-drawings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; }
+    .pdf-drawing-item { border: 1px solid #d9e3ee; border-radius: 14px; padding: 14px; background: #fff; break-inside: avoid; page-break-inside: avoid; }
+    .pdf-drawing-item .meta { font-size: 16px; color: #1f2933; line-height: 1.55; margin-bottom: 10px; font-weight: 600; }
+    .pdf-summary { margin-top: 18px; font-size: 18px; line-height: 1.6; color: #111827; font-weight: 600; }
+    .pdf-summary p { margin: 4px 0; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th, td { border:1px solid #d9e3ee; padding:6px; }
+    th { background:#f3f7fb; }
+    svg { max-width: 100%; height: auto; shape-rendering: geometricPrecision; text-rendering: geometricPrecision; }
+    @media print { body { background:#fff; padding:0; } .page { box-shadow:none; border-radius:0; max-width:none; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    ${pdfLayout.innerHTML}
+    ${materialsSection}
+  </div>
+</body>
+</html>`;
+
+      return new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
+    }
+
     function currentFilename() {
       const orderNumber = document.getElementById('orderNumber').value || 'order';
       return 'soft_windows_' + orderNumber + '.pdf';
@@ -443,6 +1287,7 @@
     document.getElementById('downloadPdfBtn').addEventListener('click', function() {
       const statusEl = document.getElementById('pdfStatus');
       statusEl.style.display = 'inline';
+      calculate(); // обновляем клиент, адрес и номер заказа перед PDF
       createPdfBlob().then(function(blob) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -460,39 +1305,62 @@
       });
     });
 
+    
+    document.getElementById('downloadSvgBtn').addEventListener('click', function() {
+      try {
+        downloadCncSvg();
+      } catch (err) {
+        console.error(err);
+        alert('Не удалось сформировать SVG: ' + err.message);
+      }
+    });
+
     document.getElementById('sendTelegramBtn').addEventListener('click', function() {
       const statusEl = document.getElementById('pdfStatus');
       statusEl.style.display = 'inline';
-      createPdfBlob().then(function(blob) {
-        if (blob.size > 4200000) {
-          throw new Error('PDF получился слишком большим: ' + (blob.size / 1024 / 1024).toFixed(2) + ' МБ. Уменьшите количество окон в одном расчёте или скачайте PDF вручную.');
+
+      try {
+        const htmlBlob = createHtmlBlob();
+
+        if (htmlBlob.size > 4200000) {
+          throw new Error('HTML-файл получился слишком большим: ' + (htmlBlob.size / 1024 / 1024).toFixed(2) + ' МБ.');
         }
+
         const formData = new FormData();
-        formData.append('document', new File([blob], currentFilename(), { type: 'application/pdf' }));
-        formData.append('caption', 'Расчёт мягких окон');
-        return fetch('/api/send-telegram', { method: 'POST', body: formData });
-      }).then(function(response) {
-        statusEl.style.display = 'none';
-        if (!response.ok) {
-          return response.text().then(function(text) { throw new Error(text || 'Ошибка отправки'); });
-        }
-        alert('Расчёт отправлен в Telegram.');
-      }).catch(function(err) {
+        formData.append('document', new File([htmlBlob], currentHtmlFilename(), { type: 'text/html' }));
+        formData.append('caption', 'Расчёт мягких окон в HTML');
+
+        fetch('/api/send-telegram', {
+          method: 'POST',
+          body: formData
+        }).then(function(response) {
+          statusEl.style.display = 'none';
+          if (!response.ok) {
+            return response.text().then(function(text) { throw new Error(text || 'Ошибка отправки'); });
+          }
+          alert('HTML-расчёт отправлен в Telegram.');
+        }).catch(function(err) {
+          console.error(err);
+          statusEl.style.display = 'none';
+          alert('Не удалось отправить HTML в Telegram: ' + err.message);
+        });
+      } catch (err) {
         console.error(err);
         statusEl.style.display = 'none';
-        alert('Не удалось отправить в Telegram: ' + err.message);
-      });
+        alert('Не удалось сформировать HTML: ' + err.message);
+      }
     });
 
     window.addEventListener('load', function() {
       document.getElementById('orderDate').value = new Date().toISOString().split('T')[0];
-      ['pricePerM2','edgingPrice','strapPrice','zipperPrice','installPrice','edgingWidth'].forEach(function(id) {
+      ['pricePerM2','edgingPrice','strapPrice','zipperPrice','installPrice','edgingWidth','orderNumber','clientName','clientAddress','orderDate'].forEach(function(id) {
         const input = document.getElementById(id);
         input.addEventListener('input', calculate);
         input.addEventListener('change', calculate);
       });
       addRow(200, 150, 150, 1, true, 4, false, 0, true, 0);
       addRow(120, 180, 150, 2, true, 6, true, 180, true, 8);
+      calculate();
     });
   </script>
 </body>
